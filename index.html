@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSAG Lead Intelligence — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Syne:wght@500;600;700&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nsag:#4D45A8;--nsag-light:#E8E5F5;--cream:#F6F3EC;--ink:#1C1B1F;
+  --ink-mid:#4A4656;--ink-soft:#8A8497;--white:#FFFFFF;
+  --border:rgba(77,69,168,0.12);--border-soft:rgba(77,69,168,0.07);
+  --pioneering:#2E5A28;--emerging:#1B7A68;--developing:#B8842A;--early:#C24A2E;
+  --m3:#4D45A8;--m4:#C24A2E;--m5:#2E5A28;--m6:#6B2937;--m7:#B8842A;--m8:#DF7B58;--m9:#1B6B8A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Manrope',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+header{background:var(--white);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:.12em;color:var(--nsag);text-transform:uppercase;}
+.badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--nsag);background:var(--nsag-light);padding:4px 10px;border-radius:2px;text-transform:uppercase;}
+.screen{display:none;min-height:calc(100vh - 57px);align-items:center;justify-content:center;padding:40px 20px;}
+.screen.active{display:flex;}
+.dash-screen{display:none;min-height:calc(100vh - 57px);padding:40px 28px;}
+.dash-screen.active{display:block;}
+.wrap{max-width:980px;margin:0 auto;}
+/* LOGIN */
+.login-card{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:40px;max-width:420px;width:100%;}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+.login-sub{font-size:14px;color:var(--ink-mid);margin-bottom:28px;line-height:1.6;}
+.login-input{width:100%;padding:13px 16px;font-family:'DM Mono',monospace;font-size:15px;border:1.5px solid var(--border);background:var(--cream);color:var(--ink);border-radius:3px;outline:none;margin-bottom:12px;letter-spacing:.06em;transition:border-color .2s;}
+.login-input:focus{border-color:var(--nsag);}
+.btn-login{width:100%;background:var(--nsag);color:var(--white);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;padding:13px;border:none;border-radius:3px;cursor:pointer;transition:background .2s;}
+.btn-login:hover{background:#3D3698;}
+.err{background:#FBE9E6;border:1px solid var(--early);border-radius:3px;padding:10px 14px;font-size:13px;color:var(--early);margin-top:10px;display:none;}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--ink);}
+.refresh-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-soft);letter-spacing:.06em;}
+/* CONTROLS */
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.filter-select{padding:9px 14px;font-family:'Manrope',sans-serif;font-size:13px;border:1.5px solid var(--border);background:var(--white);color:var(--ink);border-radius:3px;outline:none;}
+.btn-export{background:none;border:1.5px solid var(--nsag);color:var(--nsag);font-family:'Manrope',sans-serif;font-weight:600;font-size:12px;padding:9px 16px;border-radius:3px;cursor:pointer;transition:background .2s;}
+.btn-export:hover{background:var(--nsag-light);}
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border-soft);border-radius:4px;padding:18px;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--nsag);line-height:1;margin-bottom:4px;}
+.stat-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+/* MODULE CHART */
+.section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--nsag);margin-bottom:12px;margin-top:24px;}
+.module-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.module-bar-row{display:flex;align-items:center;gap:12px;}
+.module-bar-name{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-mid);width:32px;flex-shrink:0;}
+.module-bar-rail{flex:1;height:10px;background:var(--nsag-light);border-radius:3px;overflow:hidden;}
+.module-bar-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+.module-bar-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink-soft);width:28px;text-align:right;flex-shrink:0;}
+/* TIER DISTRIBUTION */
+.tier-row{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.tier-chip{padding:8px 16px;border-radius:3px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.06em;display:flex;align-items:center;gap:8px;}
+.tier-chip.pioneering{background:#E8F5E6;color:var(--pioneering);}
+.tier-chip.emerging{background:#E4F3F0;color:var(--emerging);}
+.tier-chip.developing{background:#FBF3E4;color:var(--developing);}
+.tier-chip.early{background:#FBE9E6;color:var(--early);}
+/* LEADS TABLE */
+.leads-table{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--border-soft);border-radius:4px;overflow:hidden;font-size:12px;}
+.leads-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:var(--cream);}
+.leads-table td{padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--ink-mid);vertical-align:middle;}
+.leads-table tr:last-child td{border-bottom:none;}
+.mod-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.tier-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;padding:2px 7px;border-radius:2px;text-transform:uppercase;}
+.tier-badge.pioneering{background:#E8F5E6;color:var(--pioneering);}
+.tier-badge.emerging{background:#E4F3F0;color:var(--emerging);}
+.tier-badge.developing{background:#FBF3E4;color:var(--developing);}
+.tier-badge.early{background:#FBE9E6;color:var(--early);}
+.tier-badge.unknown{background:var(--nsag-light);color:var(--nsag);}
+.loading{text-align:center;padding:48px;color:var(--ink-soft);font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.06em;}
+.attribution{text-align:center;padding:20px;font-size:11px;color:var(--ink-soft);border-top:1px solid var(--border);}
+@media(max-width:700px){
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .dash-screen{padding:24px 16px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NSAG</div>
+  <div class="badge">Lead Intelligence · Admin</div>
+</header>
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+  <div class="login-card">
+    <p style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--nsag);margin-bottom:12px;">Neurocognitive Systems Advisory Group</p>
+    <h1 class="login-title">Admin Dashboard</h1>
+    <p class="login-sub">Enter your admin key to view lead intelligence across all NSAG modules.</p>
+    <input type="password" class="login-input" id="adminKey" placeholder="Admin access key" onkeydown="if(event.key==='Enter')loadAdmin()">
+    <div class="err" id="loginErr">Incorrect key. Please try again.</div>
+    <button class="btn-login" onclick="loadAdmin()">Access Dashboard →</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash-screen" id="s-dash">
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <p style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Neurocognitive Systems Advisory Group</p>
+        <h2 class="page-title">Lead Intelligence</h2>
+      </div>
+      <div id="refreshNote" class="refresh-note"></div>
+    </div>
+    <div class="controls">
+      <select class="filter-select" id="moduleFilter" onchange="renderAdmin()">
+        <option value="all">All Modules</option>
+        <option value="nsag-m3">M3 — Psychedelic</option>
+        <option value="nsag-m4">M4 — Cannabis</option>
+        <option value="nsag-m5">M5 — Biophilic</option>
+        <option value="nsag-m6">M6 — Sponsorship</option>
+        <option value="nsag-m7">M7 — Cities</option>
+        <option value="nsag-m8">M8 — Burnout</option>
+        <option value="nsag-m9">M9 — Cannabis Visibility</option>
+        <option value="nsag-contact">Contact Form</option>
+      </select>
+      <select class="filter-select" id="tierFilter" onchange="renderAdmin()">
+        <option value="all">All Tiers</option>
+        <option value="pioneering">Pioneering</option>
+        <option value="emerging">Emerging</option>
+        <option value="developing">Developing</option>
+        <option value="early">Early Stage</option>
+      </select>
+      <button class="btn-export" onclick="exportLeads()">↓ Export CSV</button>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num" id="sTotal">—</div><div class="stat-label">Total Leads</div></div>
+      <div class="stat-card"><div class="stat-num" id="sModules">—</div><div class="stat-label">Active Modules</div></div>
+      <div class="stat-card"><div class="stat-num" id="sOrgs">—</div><div class="stat-label">Orgs Represented</div></div>
+      <div class="stat-card"><div class="stat-num" id="sToday">—</div><div class="stat-label">Today</div></div>
+    </div>
+
+    <div id="adminMain"><div class="loading">Loading lead data...</div></div>
+  </div>
+</div>
+
+<div class="attribution">NSAG Lead Intelligence · RN Collins LLC · Aloha AI Consulting · <a href="mailto:collins.ra@northeastern.edu" style="color:var(--nsag);text-decoration:none;">collins.ra@northeastern.edu</a></div>
+
+<script>
+const MODULE_COLORS = {
+  'nsag-m3':'#4D45A8','nsag-m4':'#C24A2E','nsag-m5':'#2E5A28',
+  'nsag-m6':'#6B2937','nsag-m7':'#B8842A','nsag-m8':'#DF7B58',
+  'nsag-m9':'#1B6B8A','nsag-contact':'#8A8497'
+};
+const MODULE_NAMES = {
+  'nsag-m3':'M3 Psychedelic','nsag-m4':'M4 Cannabis','nsag-m5':'M5 Biophilic',
+  'nsag-m6':'M6 Sponsorship','nsag-m7':'M7 Cities','nsag-m8':'M8 Burnout',
+  'nsag-m9':'M9 Cannabis Vis.','nsag-contact':'Contact Form'
+};
+
+let allLeads = [];
+let adminKey = '';
+let refreshInterval = null;
+let refreshSecs = 0;
+
+function show(id) {
+  document.querySelectorAll('.screen,.dash-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function loadAdmin() {
+  const key = document.getElementById('adminKey').value.trim();
+  if(!key){document.getElementById('loginErr').style.display='block';return;}
+  adminKey = key;
+  document.getElementById('adminMain').innerHTML='<div class="loading">Loading leads...</div>';
+  try {
+    const res = await fetch(`https://nsag-api.vercel.app/api/admin?key=${encodeURIComponent(key)}`);
+    if(res.status===403||res.status===401){document.getElementById('loginErr').style.display='block';return;}
+    if(res.status===404){
+      // Admin endpoint not yet deployed — load from what we can
+      document.getElementById('adminMain').innerHTML='<div class="loading">Admin API endpoint not yet deployed. Deploy api/admin.js to nsag-api.</div>';
+      show('s-dash');return;
+    }
+    const data = await res.json();
+    allLeads = data.leads || [];
+    show('s-dash');
+    renderAdmin();
+    startRefresh();
+  } catch(e) {
+    document.getElementById('adminMain').innerHTML='<div class="loading">Unable to connect. Check API is deployed.</div>';
+    show('s-dash');
+  }
+}
+
+function startRefresh() {
+  if(refreshInterval) clearInterval(refreshInterval);
+  refreshSecs = 0;
+  refreshInterval = setInterval(async()=>{
+    refreshSecs++;
+    const el = document.getElementById('refreshNote');
+    if(el) el.textContent = refreshSecs<60?`Refreshes in ${60-refreshSecs}s`:'Refreshing...';
+    if(refreshSecs>=60){
+      refreshSecs=0;
+      try {
+        const res = await fetch(`https://nsag-api.vercel.app/api/admin?key=${encodeURIComponent(adminKey)}`);
+        if(res.ok){const data=await res.json();allLeads=data.leads||[];renderAdmin();}
+      }catch(e){}
+    }
+  },1000);
+}
+
+function renderAdmin() {
+  const modF = document.getElementById('moduleFilter').value;
+  const tierF = document.getElementById('tierFilter').value;
+  let leads = allLeads;
+  if(modF!=='all') leads = leads.filter(l=>l.source===modF);
+  if(tierF!=='all') leads = leads.filter(l=>l.tier===tierF);
+
+  // Stats
+  const uniqueOrgs = new Set(leads.filter(l=>l.org).map(l=>l.org.toLowerCase().trim())).size;
+  const today = new Date().toDateString();
+  const todayCount = leads.filter(l=>l.timestamp&&new Date(l.timestamp).toDateString()===today).length;
+  const activeModules = new Set(leads.map(l=>l.source)).size;
+  document.getElementById('sTotal').textContent = leads.length;
+  document.getElementById('sModules').textContent = activeModules;
+  document.getElementById('sOrgs').textContent = uniqueOrgs||'—';
+  document.getElementById('sToday').textContent = todayCount;
+
+  if(leads.length===0){
+    document.getElementById('adminMain').innerHTML='<div class="loading">No leads match this filter yet.</div>';
+    return;
+  }
+
+  let html = '';
+
+  // Module bar chart
+  const modCounts = {};
+  leads.forEach(l=>{modCounts[l.source]=(modCounts[l.source]||0)+1;});
+  const maxCount = Math.max(...Object.values(modCounts),1);
+  html += `<p class="section-label">Leads by Module</p><div class="module-bars">`;
+  Object.entries(modCounts).sort((a,b)=>b[1]-a[1]).forEach(([mod,count])=>{
+    const color = MODULE_COLORS[mod]||'#8A8497';
+    const name = MODULE_NAMES[mod]||mod;
+    const pct = Math.round(count/maxCount*100);
+    html += `<div class="module-bar-row">
+      <div class="module-bar-name" style="width:80px;font-size:10px;">${name}</div>
+      <div class="module-bar-rail"><div class="module-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="module-bar-count">${count}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Tier distribution
+  const tierCounts = {pioneering:0,emerging:0,developing:0,early:0};
+  leads.forEach(l=>{if(tierCounts[l.tier]!==undefined)tierCounts[l.tier]++;});
+  html += `<p class="section-label">Tier Distribution</p><div class="tier-row">`;
+  Object.entries(tierCounts).forEach(([tier,count])=>{
+    if(count>0) html+=`<div class="tier-chip ${tier}">${tier==='early'?'Early Stage':tier.charAt(0).toUpperCase()+tier.slice(1)} <strong>${count}</strong></div>`;
+  });
+  html += `</div>`;
+
+  // Leads table
+  const sorted = [...leads].sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+  html += `<p class="section-label">All Leads (${sorted.length})</p>
+  <table class="leads-table">
+    <thead><tr><th>Email</th><th>Org</th><th>Module</th><th>Tier</th><th>Date</th></tr></thead>
+    <tbody>`;
+  sorted.forEach(l=>{
+    const color = MODULE_COLORS[l.source]||'#8A8497';
+    const modName = MODULE_NAMES[l.source]||l.source||'—';
+    const tier = l.tier||'unknown';
+    const ts = l.timestamp?new Date(l.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+    html+=`<tr>
+      <td><strong style="color:var(--ink)">${l.email||'—'}</strong></td>
+      <td>${l.org||'—'}</td>
+      <td><span class="mod-dot" style="background:${color}"></span>${modName}</td>
+      <td><span class="tier-badge ${tier}">${tier==='early'?'Early Stage':tier.charAt(0).toUpperCase()+tier.slice(1)}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;">${ts}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById('adminMain').innerHTML = html;
+}
+
+function exportLeads() {
+  const modF = document.getElementById('moduleFilter').value;
+  const tierF = document.getElementById('tierFilter').value;
+  let leads = allLeads;
+  if(modF!=='all') leads=leads.filter(l=>l.source===modF);
+  if(tierF!=='all') leads=leads.filter(l=>l.tier===tierF);
+  if(!leads.length){alert('No leads to export.');return;}
+  const header=['email','org','source','module','tier','timestamp'].join(',');
+  const rows=[header,...leads.map(l=>[l.email,l.org||'',l.source||'',l.module||'',l.tier||'',l.timestamp||''].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download=`nsag-leads-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>
