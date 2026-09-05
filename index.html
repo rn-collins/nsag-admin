@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NSAG Lead Intelligence — Admin</title>
+<meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Syne:wght@500;600;700&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -173,7 +174,7 @@ async function loadAdmin() {
   adminKey = key;
   document.getElementById('adminMain').innerHTML='<div class="loading">Loading leads...</div>';
   try {
-    const res = await fetch(`https://nsag-api.vercel.app/api/admin?key=${encodeURIComponent(key)}`);
+    const res = await fetch('https://nsag-api.vercel.app/api/admin', { headers: { Authorization: `Bearer ${key}` } });
     if(res.status===403||res.status===401){document.getElementById('loginErr').style.display='block';return;}
     if(res.status===404){
       // Admin endpoint not yet deployed — load from what we can
@@ -201,7 +202,7 @@ function startRefresh() {
     if(refreshSecs>=60){
       refreshSecs=0;
       try {
-        const res = await fetch(`https://nsag-api.vercel.app/api/admin?key=${encodeURIComponent(adminKey)}`);
+        const res = await fetch('https://nsag-api.vercel.app/api/admin', { headers: { Authorization: `Bearer ${adminKey}` } });
         if(res.ok){const data=await res.json();allLeads=data.leads||[];renderAdmin();}
       }catch(e){}
     }
